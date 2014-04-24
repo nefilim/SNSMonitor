@@ -35,7 +35,7 @@ object Publish {
             <name>Peter van Rensburg</name>
             <url>http://www.nefilim.org</url>
           </developer>
-        </developers>)
+        </developers>),
     organizationName := "org.nefilim",
     organizationHomepage := Some(url("http://www.github.com/nefilim")),
     publishMavenStyle := false,
