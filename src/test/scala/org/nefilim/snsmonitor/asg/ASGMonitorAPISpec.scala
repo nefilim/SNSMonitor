@@ -1,10 +1,10 @@
-package org.nefilim.asgmonitor
+package org.nefilim.snsmonitor.asg
 
 import org.scalatest.{FunSpec, Matchers}
 import com.typesafe.scalalogging.slf4j.Logging
 import spray.testkit.ScalatestRouteTest
 import API._
-import ASGMonitorAPI._
+import SNSMonitorAPI._
 import spray.routing.HttpService
 import spray.http.HttpHeaders
 import HttpHeaders._
@@ -16,7 +16,7 @@ class ASGMonitorAPISpec
   extends FunSpec
   with Matchers
   with ScalatestRouteTest
-  with ASGMonitorAPI
+  with SNSMonitorAPI
   with StubServiceActors
   with AkkaExecutionContextProvider
   with HttpService

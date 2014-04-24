@@ -1,8 +1,8 @@
-package org.nefilim.asgmonitor
+package org.nefilim.snsmonitor.asg
 
 import spray.routing._
 
-import ASGMonitorAPI.eventRouteBase
+import SNSMonitorAPI.eventRouteBase
 import spray.routing.Directives._
 import com.typesafe.scalalogging.slf4j.Logging
 import akka.util.Timeout
@@ -16,9 +16,9 @@ import akka.pattern._
 import spray.httpx.marshalling.MetaMarshallers
 import scala.concurrent.Promise
 
-object ASGMonitorAPI extends Logging {
-  private[asgmonitor] val ASGMonitorAPIVersion = "v1"
-  private[asgmonitor] val ASGEventPath = "asgevent"
+object SNSMonitorAPI extends Logging {
+  private[asg] val ASGMonitorAPIVersion = "v1"
+  private[asg] val ASGEventPath = "asgevent"
 
   def eventRouteBase(innerRoute: Route): Route = {
     apiRoot {
@@ -34,6 +34,7 @@ object ASGMonitorAPI extends Logging {
         Signature: String,
         SignatureVersion: String,
         SigningCertURL: String,
+        SubscribeURL: String,
         Timestamp: String,
         Token: String,
         TopicArn: String,
@@ -53,14 +54,14 @@ object ASGMonitorAPI extends Logging {
 
   object MyJsonProtocol extends DefaultJsonProtocol {
     implicit val snsNotificationFormat = jsonFormat10(SNSNotification)
-    implicit val snsSubscriptionConfirmFormat = jsonFormat9(SNSSubscriptionConfirm)
+    implicit val snsSubscriptionConfirmFormat = jsonFormat10(SNSSubscriptionConfirm)
   }
 }
 
-import ASGMonitorAPI._
+import SNSMonitorAPI._
 import MyJsonProtocol._
 
-trait ASGMonitorAPI extends HttpService with Logging with SprayJsonSupport with MetaMarshallers { this: ServiceActors with AkkaExecutionContextProvider =>
+trait SNSMonitorAPI extends HttpService with Logging with SprayJsonSupport with MetaMarshallers { this: ServiceActors with AkkaExecutionContextProvider =>
 
   implicit val timeout = Timeout(5 seconds)
 

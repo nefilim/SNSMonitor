@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{15}) - %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.amazonaws" level="INFO" />
+    <logger name="org.eclipse.jetty" level="ERROR" />
+    <logger name="org.apache.camel" level="ERROR" />
+    <logger name="org.apache.http" level="WARN" />
+    <logger name="org.springframework" level="WARN" />
+    <logger name="jndi" level="WARN" />
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>

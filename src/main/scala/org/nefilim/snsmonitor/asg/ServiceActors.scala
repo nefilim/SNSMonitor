@@ -1,4 +1,4 @@
-package org.nefilim.asgmonitor
+package org.nefilim.snsmonitor.asg
 
 import akka.actor.{ActorLogging, Actor, ActorRef}
 import javax.management.Notification
@@ -15,10 +15,4 @@ trait AkkaExecutionContextProvider {
   implicit val executionContext: ExecutionContext
 }
 
-class MonitorService extends Actor with ActorLogging {
-  def receive: Receive = {
-    case n: Notification =>
-      log.info("got notification {}", n)
-  }
-}
 

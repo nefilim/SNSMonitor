@@ -1,7 +1,7 @@
-package org.nefilim.asgmonitor
+package org.nefilim.snsmonitor.asg
 
 import akka.actor.ActorDSL._
-import org.nefilim.asgmonitor.ASGMonitorAPI.{SNSSubscriptionConfirm, SNSNotification}
+import org.nefilim.snsmonitor.asg.SNSMonitorAPI.{SNSSubscriptionConfirm, SNSNotification}
 import spray.http.StatusCodes
 import spray.routing.HttpService
 import akka.actor.ActorLogging
