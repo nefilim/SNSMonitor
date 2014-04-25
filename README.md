@@ -3,6 +3,8 @@ SNSMonitor
 
 HTTP(s) service to consume SNS Notifications. The primary motivation for creating this is to keep Chef's view in sync with EC2 Auto Scale groups (created by CloudFormation). 
 
+Depends on https://github.com/nefilim/ScalaChefClient
+
 Integrated **x-amz-sns-message-type** types:
 
 * SubscriptionConfirmation - does the callback to the provided callback URL to confirm the subscription
