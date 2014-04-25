@@ -8,7 +8,7 @@ import scala.Some
 import akka.event.Logging
 
 object API {
-  val ApiRootOU = "asgm"
+  val ApiRootOU = "snsmonitor"
 
   def apiRoot(innerRoute: Route) = {
     pathPrefix(ApiRootOU) {

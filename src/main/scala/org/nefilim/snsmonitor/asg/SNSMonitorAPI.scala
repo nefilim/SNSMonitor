@@ -46,7 +46,7 @@ object SNSMonitorAPI extends Logging {
           Signature: String,
           SignatureVersion: String,
           SigningCertURL: String,
-          Subject: String,
+          Subject: Option[String],
           Timestamp: String,
           TopicArn: String,
           Type: String,
@@ -72,6 +72,7 @@ trait SNSMonitorAPI extends HttpService with Logging with SprayJsonSupport with 
           logRequestResponse(logRejections _) { ctx =>
             ctx.complete {
               val message = ctx.request.headers.find(_.lowercaseName == "x-amz-sns-message-type").map { header =>  // headerByValue doesn't work anymore once we extracted ctx, why??
+                logger.info("raw request {}", ctx.request.entity.asString)
                 val json = JsonParser(ctx.request.entity.asString(HttpCharsets.`UTF-8`))
                 header.value.toLowerCase match {
                   case "subscriptionconfirmation" =>

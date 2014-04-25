@@ -29,8 +29,9 @@ object Dependencies {
     val spray = "1.3.1"
     val typesafeConfig = "1.2.0"
 
-    val sprayJson = "1.2.5"
+    val sprayJson = "1.2.6"
     val json4s = "3.2.8"
+    val scalaChefClient = "0.3-SNAPSHOT"
   }
 
   object Libraries {
@@ -43,17 +44,17 @@ object Dependencies {
     val slf4jlog4j = "org.slf4j"             % "log4j-over-slf4j"         % V.slf4j
     val slf4jAPI = "org.slf4j"               % "slf4j-api"                % V.slf4j
 
-    val sprayClient = "io.spray"             % "spray-client"     % V.spray
-    val sprayRouting = "io.spray"            % "spray-routing"    % V.spray
-    val sprayCan = "io.spray"                % "spray-can"     % V.spray
+    val sprayClient = "io.spray"             % "spray-client"   % V.spray
+    val sprayRouting = "io.spray"            % "spray-routing"  % V.spray
+    val sprayCan = "io.spray"                % "spray-can"      % V.spray
     val sprayHTTP = "io.spray"               % "spray-http"     % V.spray
-    val sprayHTTPx = "io.spray"              % "spray-httpx"     % V.spray
-    val sprayTestKit = "io.spray"            % "spray-testkit" % V.spray
-    val sprayJson = "io.spray"               %% "spray-json" % V.sprayJson
+    val sprayHTTPx = "io.spray"              % "spray-httpx"    % V.spray
+    val sprayTestKit = "io.spray"            % "spray-testkit"  % V.spray
+    val sprayJson = "io.spray"               %% "spray-json"    % V.sprayJson
 
     val json4sNative = "org.json4s"          %% "json4s-native" % V.json4s
     val json4sJackon = "org.json4s"          %% "json4s-jackson" % V.json4s
-    val json4sExtensions = "org.json4s"      %% "json4s-ext" % V.json4s
+    val json4sExtensions = "org.json4s"      %% "json4s-ext"    % V.json4s
 
     val akka = "com.typesafe.akka"           %% "akka-actor"    % V.akka
     val akkaKernel = "com.typesafe.akka"     %% "akka-kernel"   % V.akka
@@ -62,10 +63,11 @@ object Dependencies {
     val akkaLogging = "com.typesafe.akka"    %% "akka-slf4j"    % V.akka
 
     val typesafeConfig = "com.typesafe"      % "config"         % V.typesafeConfig
+    val scalaChefClient = ("org.nefilim"     %% "chefclient"    % V.scalaChefClient).excludeAll( ExclusionRule(organization = "io.spray"))
   }
 
   import Libraries._
 
   val autoScaleGroupMonitor = Seq(awsSDK, akka, akkaTestKit, akkaLogging, typesafeLogging, 
-    sprayClient, sprayCan, sprayHTTP, sprayRouting, sprayJson, sprayTestKit, scalaTest, logback)
+    sprayClient, sprayCan, sprayHTTP, sprayRouting, sprayJson, sprayTestKit, scalaTest, logback, scalaChefClient)
 }
