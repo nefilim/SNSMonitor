@@ -9,6 +9,7 @@ object Publish {
     publishArtifact in (Compile, packageDoc) := false,
     publishArtifact in (Compile, packageSrc) := false,
     publishArtifact in Test := false,
+    /*
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
       if (isSnapshot.value)
@@ -16,6 +17,7 @@ object Publish {
       else
         Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     },
+    */
     pomExtra := (
       <url>https://github.com/nefilim/ScalaChefClient</url>
         <licenses>
