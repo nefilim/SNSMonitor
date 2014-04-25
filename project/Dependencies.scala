@@ -31,7 +31,7 @@ object Dependencies {
 
     val sprayJson = "1.2.6"
     val json4s = "3.2.8"
-    val scalaChefClient = "0.3-SNAPSHOT"
+    val scalaChefClient = "0.3"
   }
 
   object Libraries {
