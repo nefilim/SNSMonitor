@@ -18,7 +18,7 @@ import scala.concurrent.Promise
 
 object SNSMonitorAPI extends Logging {
   private[asg] val ASGMonitorAPIVersion = "v1"
-  private[asg] val ASGEventPath = "asgevent"
+  private[asg] val ASGEventPath = "event"
 
   def eventRouteBase(innerRoute: Route): Route = {
     apiRoot {
