@@ -1,7 +1,7 @@
 SNSMonitor
 ==========
 
-HTTP(s) service to consume SNS Notifications. The primary goal was to keep Chef's view in sync with EC2 Auto Scale groups created by CloudFormation.
+HTTP(s) service to consume SNS Notifications. The primary motivation for creating this is to keep Chef's view in sync with EC2 Auto Scale groups (created by CloudFormation). 
 
 Integrated **x-amz-sns-message-type** types:
 
