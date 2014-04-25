@@ -5,7 +5,6 @@ import com.typesafe.sbt.packager.MappingsHelper._
 import com.typesafe.sbt.SbtNativePackager._
 import NativePackagerKeys._
 import sbtbuildinfo.Plugin._
-import sbtrelease.ReleasePlugin._
 
 object MyBuild extends Build {
 
@@ -19,7 +18,7 @@ object MyBuild extends Build {
 
   lazy val buildSettings = Defaults.defaultSettings ++ graphSettings ++ Seq( // must include Defaults.defaultSettings somewhere (early) in the chain
     organization := "org.nefilim",
-    version      := "0.1-SNAPSHOT", 
+    version      := "0.2-SNAPSHOT",
     scalaVersion := myScalaVersion
   )
 
@@ -38,7 +37,7 @@ object MyBuild extends Build {
     publishLocal <<= publishLocal.dependsOn(publishLocal in Universal)
   )
 
-  lazy val defaultSettings = buildSettings ++ Publish.settings ++ releaseSettings ++ Seq(
+  lazy val defaultSettings = buildSettings ++ Publish.settings ++ Seq(
     scalacOptions in Compile ++= Seq("-encoding", "UTF-8", "-target:jvm-1.7", "-deprecation", "-feature", "-unchecked", "-Xlog-reflective-calls"),
     testOptions in Test += Tests.Argument("-oDF"),
     incOptions := incOptions.value.withNameHashing(true)
