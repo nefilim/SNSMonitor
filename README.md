@@ -18,3 +18,11 @@ Integrated **x-amz-sns-message-type** types:
 
 The provided Instance_Id is queried with the Chef client, the resulting node is then deleted as well as the accompanying chef client. 
 **Note** it is assumed that your Ohai is hinted with ec2 so that the ec2 attributes are populated on the node. It will search on the *instance_id* attribute under *ec2*. 
+
+
+Configuration
+-------------
+
+see ```src/main/config/application.conf``` for configuring the chef client. It also supports an optional parameter *organization* in the chef stanza for enterprise chef. 
+
+Specify the location with ```-Dconfig.file=/path/application.conf```.
