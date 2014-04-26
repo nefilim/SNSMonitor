@@ -34,7 +34,7 @@ tar cvfz cookbooks.tar.gz cookbooks
 ```
 Upload cookbooks.tar.gz to S3 bucket.
 
-Included is a CloudFormation template (```src/main/cloudformation```) and Chef cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. 
+Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. 
 
 Installation locations: 
 * binaries (jars): ```/usr/local/snsmonitor/```
@@ -58,8 +58,12 @@ Right now you have to make your own plan to get your keys on the your instances.
 Standalone Configuration
 ---
 
+If you don't want to use the CloudFormation template & cookbooks and do a manual installation:
+
 see ```src/main/config/application.conf``` for configuring the chef client. It also supports an optional parameter *organization* in the chef stanza for enterprise chef. 
 
 Specify the location with ```-Dconfig.file=/path/application.conf```.
+
+```logback.xml``` should be on the classpath somewhere. The sbt-release generated startup script in the tgz seems to work. 
 
 
