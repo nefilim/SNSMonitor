@@ -58,8 +58,12 @@ Right now you have to make your own plan to get your keys on the your instances.
 Standalone Configuration
 ---
 
+If you don't want to use the CloudFormation template & cookbooks and do a manual installation:
+
 see ```src/main/config/application.conf``` for configuring the chef client. It also supports an optional parameter *organization* in the chef stanza for enterprise chef. 
 
 Specify the location with ```-Dconfig.file=/path/application.conf```.
+
+```logback.xml``` should be on the classpath somewhere. The sbt-release generated startup script in the tgz seems to work. 
 
 
