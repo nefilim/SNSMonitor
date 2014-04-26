@@ -25,7 +25,7 @@ object MyBuild extends Build {
   lazy val myBuildInfoSettings = buildInfoSettings ++ Seq(
     sourceGenerators in Compile <+= buildInfo,
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, BuildInfoKey.action("buildTime") { new java.util.Date() }),
-    buildInfoPackage := "com.minomonsters.generated"
+    buildInfoPackage := "org.nefilim.generated"
   )
 
   lazy val myPackagerSettings = packageArchetype.java_application ++ deploymentSettings ++ Seq(
