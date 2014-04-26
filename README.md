@@ -43,7 +43,7 @@ tar cvfz cookbooks.tar.gz cookbooks
 ```
 Upload cookbooks.tar.gz to S3 bucket.
 
-Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. 
+Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef Solo cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. 
 
 Installation locations: 
 * startup script ```/etc/init.d/snsmonitor```
