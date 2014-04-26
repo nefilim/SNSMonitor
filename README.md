@@ -1,9 +1,9 @@
 SNSMonitor
 ==========
 
-HTTP(s) service to consume SNS Notifications. The primary motivation for creating this is to keep Chef's view in sync with EC2 Auto Scale groups (created by CloudFormation). 
+HTTP(s) service to consume SNS Notifications. The primary motivation for creating this is to keep Chef's view in sync with EC2 Auto Scale groups. When AutoScale groups scale out, new nodes are registered with Chef (Hosted/Server) as they start up but when the AutoScale group scales in/down, the nodes & clients are orphaned in Chef (Hosted/Server). By registering your AutoScalingGroup with a SNS topic, notifications are sent for the group lifecycle events. SNSMonitor will consume these notifications and in case of scaling in/down, the corresponding chef nodes & clients will be deleted from Chef (Hosted/Server). 
 
-Depends on https://github.com/nefilim/ScalaChefClient. A HTTP(s) subscription needs to be added to the SNS topic (that is associated with your AutoScale group) that points to the endpoint exposed by this service. Note that SNS doesn't appear to support VPC nodes, so it must be a public (or the ELB in front of it at least), for instance: 
+Depends on https://github.com/nefilim/ScalaChefClient. A HTTP(s) subscription needs to be added to the SNS topic (that is associated with your AutoScale group) that points to the endpoint exposed by this service. Note that SNS doesn't appear to support VPC nodes, so it must be a public (or public ELB fronted), for instance: 
 
 http://54.54.23.23:8080/snsmonitor/v1/event
 
@@ -21,6 +21,15 @@ The provided Instance_Id is queried with the Chef client, the resulting node is 
 
 Installation
 ---
+
+Be sure to register a notification topic with your *AWS::AutoScaling::AutoScalingGroup* in your CloudFormation template:
+
+```
+"NotificationConfiguration" : {
+   "TopicARN" : { "Ref" : "NotificationTopic" },
+   "NotificationTypes" : [ "autoscaling:EC2_INSTANCE_LAUNCH","autoscaling:EC2_INSTANCE_LAUNCH_ERROR","autoscaling:EC2_INSTANCE_TERMINATE", "autoscaling:EC2_INSTANCE_TERMINATE_ERROR"]
+},
+```
 
 ```
 git clone https://github.com/nefilim/SNSMonitor.git
