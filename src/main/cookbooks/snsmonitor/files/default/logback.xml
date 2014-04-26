@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true">
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>/var/log/snsmonitor/snsmonitor.log</file>
+      <encoder>
+        <pattern>%date %level [%thread] %logger{10} [%file : %line] %msg%n</pattern>
+      </encoder>
+      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <!-- daily rollover -->
+        <fileNamePattern>snsmonitor.log.%d{yyyy-MM-dd}</fileNamePattern>
+
+        <maxHistory>14</maxHistory>
+      </rollingPolicy>
+    </appender>
+
+    <logger name="com.amazonaws" level="INFO" />
+    <logger name="org.nefilim.chefclient" level="INFO" />
+
+    <root level="DEBUG">
+      <appender-ref ref="FILE" />
+    </root>
+
+</configuration>

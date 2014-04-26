@@ -1,0 +1,270 @@
+{
+   "AWSTemplateFormatVersion" : "2010-09-09",
+
+   "Description" : "Install SNS Monitor node.",
+
+   "Parameters" : {
+
+       "SNSMonitorBinaryURL" : {
+         "Description" : "URL to the SNS Monitor tgz, typically S3 bucket",
+         "Type" : "String"
+       },
+
+       "ChefCookbookURL" : {
+         "Description" : "URL to your cookbooks.tar.gz, typically S3 bucket",
+         "Type" : "String"
+       },
+
+       "ChefUserId" : {
+         "Description" : "User ID to use with the Chef Server API",
+         "Type" : "String"
+       },
+
+       "ChefKeyPath" : {
+         "Description" : "The Chef Organization to use with the Chef Server API",
+         "Type" : "String",
+         "Default" : "/etc/snsmonitor/client.pem"
+       },
+
+       "ChefOrganization" : {
+         "Description" : "The Chef Organization to use with the Chef Server API",
+         "Type" : "String"
+       },
+
+       "VpcId" : {
+         "Type" : "String",
+         "Description" : "VpcId of your existing Virtual Private Cloud (VPC)"
+       },
+       "NodeSubnets" : {
+         "Type" : "CommaDelimitedList",
+         "Description" : "The SubnetId in your VPC for the AutoScaleGroup - this should probably be a private subnet"
+       },
+       "LBSubnets" : {
+         "Type" : "CommaDelimitedList",
+         "Description" : "The SubnetId in your VPC for your ELB - this should be your public subnet with IGW"
+       },
+
+      "InstanceType" : {
+        "Description" : "Frontend EC2 instance type",
+        "Type" : "String",
+        "Default" : "t1.micro",
+        "AllowedValues" : [ "t1.micro", "m1.small", "m3.medium", "m3.large"],
+        "ConstraintDescription" : "must be a valid EC2 instance type."
+      },
+
+      "GroupSize": {
+        "Default": "2",
+        "Description" : "The default number of EC2 instances for the frontend cluster",
+        "Type": "Number"
+      },
+
+      "MaxSize": {
+        "Default": "2",
+        "Description" : "The maximum number of EC2 instances for the frontend",
+        "Type": "Number"
+      },
+
+      "SSHLocation" : {
+        "Description" : " The IP address range that can be used to SSH to the EC2 instances",
+        "Type": "String",
+        "MinLength": "9",
+        "MaxLength": "18",
+        "Default": "0.0.0.0/0",
+        "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+        "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+      },
+
+      "KeyName" : {
+        "Description" : "The EC2 Key Pair to allow SSH access to the instances",
+        "Type" : "String"
+      }
+
+   },
+
+   "Mappings" : {
+      "AWSInstanceType2Arch" : {
+        "t1.micro"   : { "Arch" : "64" },
+        "m1.small"   : { "Arch" : "64" },
+        "m1.medium"  : { "Arch" : "64" },
+        "m1.large"   : { "Arch" : "64" },
+        "m1.xlarge"  : { "Arch" : "64" },
+        "m2.xlarge"  : { "Arch" : "64" },
+        "m2.2xlarge"  : { "Arch" : "64" },
+        "m2.4xlarge"  : { "Arch" : "64" },
+        "m3.xlarge"  : { "Arch" : "64" },
+        "m3.2xlarge"  : { "Arch" : "64" },
+        "c1.medium"  : { "Arch" : "64" },
+        "c1.xlarge"  : { "Arch" : "64" },
+        "cc1.4xlarge" : { "Arch" : "64HVM" },
+        "cc2.8xlarge" : { "Arch" : "64HVM" },
+        "cg1.4xlarge" : { "Arch" : "64HVM" }
+      },
+
+      "AWSRegionArch2AMI" : {
+        "us-east-1"    : { "32" : "ami-178e927e", "64" : "ami-fb8e9292", "64HVM" : "ami-978d91fe" },
+        "us-west-2"    : { "32" : "ami-1e3a502e", "64" : "ami-043a5034", "64HVM" : "ami-383a5008" }
+      }
+   },
+
+   "Resources" : {
+
+      "ElasticLoadBalancer": {
+        "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+        "Properties": {
+           "SecurityGroups" : [ { "Ref" : "LoadBalancerSecurityGroup" } ],
+           "Subnets" : { "Ref" : "LBSubnets" },
+           "Listeners": [
+              { "InstancePort": 8080,
+                "Protocol": "HTTP",
+                "LoadBalancerPort": "80"
+              }
+           ],
+           "HealthCheck": {
+              "HealthyThreshold": "2",
+              "Timeout": "5",
+              "Interval": "10",
+              "UnhealthyThreshold": "5",
+              "Target": "HTTP:8080/snsmonitor/v1/health"
+           }
+        }
+      },
+
+      "WebServerGroup": {
+        "Type": "AWS::AutoScaling::AutoScalingGroup",
+        "Properties": {
+           "LoadBalancerNames": [{ "Ref": "ElasticLoadBalancer" }],
+           "LaunchConfigurationName": {"Ref": "LaunchConfig"},
+           "AvailabilityZones": { "Fn::GetAZs": { "Ref": "AWS::Region" } },
+           "VPCZoneIdentifier" : { "Ref" : "NodeSubnets" },
+           "MinSize": "1",
+           "MaxSize": { "Ref" : "MaxSize" },
+           "DesiredCapacity" : { "Ref" : "GroupSize" },
+           "Tags" : [
+              { "Key" : "Name", "Value" : { "Fn::Join" : [ "", [{ "Ref" : "AWS::StackName" } ]] }, "PropagateAtLaunch" : "true" }
+           ]
+        }
+      },
+
+      "LaunchConfig": {
+        "Type": "AWS::AutoScaling::LaunchConfiguration",
+        "Metadata" : {
+           "AWS::CloudFormation::Init" : {
+              "config" : {
+                "packages" : {
+                   "yum" : {
+                      "telnet" : []
+                   }
+                },
+                "files" : {
+                   "/etc/chef/solo.rb" : {
+                      "content" : { "Fn::Join" : ["", [
+                        "log_level :info\n",
+                        "log_location STDOUT\n",
+                        "file_cache_path \"/var/chef-solo\"\n",
+                        "cookbook_path \"/var/chef-solo/cookbooks\"\n",
+                        "json_attribs \"/etc/chef/node.json\"\n",
+                        "recipe_url \"", { "Ref" : "ChefCookbookURL" }, "\"\n",
+                        "ssl_verify_mode :verify_peer\n"
+                      ]] },
+                      "mode" : "000644",
+                      "owner" : "root",
+                      "group" : "wheel"
+                   },
+                   "/etc/chef/node.json" : {
+                      "content" : {
+                        "java": {
+                          "install_flavor": "oracle",
+                          "jdk_version": "7",
+                          "oracle": {
+                            "accept_oracle_download_terms": "true"
+                          }
+                        },
+                        "snsmonitor" : {
+                          "url": {"Ref": "SNSMonitorBinaryURL"},
+                          "chef": {
+                            "client_id": {"Ref" : "ChefUserId"},
+                            "key_path": {"Ref" : "ChefKeyPath"},
+                            "organization": {"Ref" : "ChefOrganization"}
+                          }
+                        },
+                        "run_list": [ "recipe[java]", "recipe[snsmonitor]" ]
+                      },
+                      "mode" : "000644",
+                      "owner" : "root",
+                      "group" : "wheel"
+                   }
+                }
+              }
+           }
+        },
+        "Properties": {
+           "KeyName" : { "Ref" : "KeyName" },
+           "InstanceType" : { "Ref" : "InstanceType" },
+           "SecurityGroups" : [ { "Ref" : "SSHGroup" }, {"Ref" : "InstanceSecurityGroup"} ],
+           "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
+              { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] } ] },
+           "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
+              "#!/bin/bash\n",
+              "yum update -y aws-cfn-bootstrap\n",
+
+              "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r LaunchConfig ",
+              "      --region ", { "Ref" : "AWS::Region" }, " && ",
+              "# Chef install\n",
+              "curl -L http://www.opscode.com/chef/install.sh | bash > /tmp/chef_install.log 2>&1 || error_exit 'Failed to initialize host via chef client' \n",
+
+              "chef-solo > /tmp/chef_firstrun.log 2>&1\n",
+              "/opt/aws/bin/cfn-signal -e $? '", { "Ref" : "WaitHandle" }, "'\n"
+           ]]}}
+        }
+      },
+
+      "WaitHandle" : {
+        "Type" : "AWS::CloudFormation::WaitConditionHandle"
+      },
+
+      "WaitCondition" : {
+        "Type" : "AWS::CloudFormation::WaitCondition",
+        "DependsOn" : "WebServerGroup",
+        "Properties" : {
+           "Handle" : {"Ref" : "WaitHandle"},
+           "Timeout" : "600"
+        }
+      },
+
+      "SSHGroup" : {
+        "Type" : "AWS::EC2::SecurityGroup",
+        "Properties" : {
+           "GroupDescription" : "Enable SSH access",
+           "VpcId" : { "Ref" : "VpcId" },
+           "SecurityGroupIngress" : [ {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "SSHLocation"}}]
+        }
+      },
+
+      "LoadBalancerSecurityGroup" : {
+        "Type" : "AWS::EC2::SecurityGroup",
+        "Properties" : {
+          "GroupDescription" : "ELB security group",
+          "VpcId" : { "Ref" : "VpcId" },
+          "SecurityGroupIngress" : [
+            { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0" }
+           ]
+        }
+      },
+
+      "InstanceSecurityGroup" : {
+        "Type" : "AWS::EC2::SecurityGroup",
+        "Properties" : {
+           "GroupDescription" : "Enable HTTP access via port 80",
+           "VpcId" : { "Ref" : "VpcId" },
+           "SecurityGroupIngress" : [ { "IpProtocol" : "tcp", "FromPort" : "8080", "ToPort" : "8080", "CidrIp" : "10.0.0.0/16" } ]
+        }
+      }
+   },
+
+   "Outputs" : {
+      "WebsiteURL" : {
+        "Value" : { "Fn::Join" : ["", ["http://", { "Fn::GetAtt" : [ "ElasticLoadBalancer", "DNSName" ]}, "/"]]},
+        "Description" : "URL to SNS Monitor"
+      }
+   }
+}

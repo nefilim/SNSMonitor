@@ -1,0 +1,128 @@
+#!/bin/bash
+#
+# chkconfig: 345 80 20
+# description: <%= @service_name%> service
+# processname: <%= @service_name%>
+
+BASE_PATH="<%=@service_dir%>"
+JSVC=/usr/bin/jsvc 
+OUTFILE=/var/log/<%= @service_name %>/stdout.log
+#ERRFILE=/var/log/<%= @service_name %>/stderr.log
+ERRFILE="&1"
+PIDFILE=/var/run/<%= @service_name %>.pid
+JVM_OPTS="-server -Xmx1024m"
+JVM_OPTS="$JVM_OPTS -Djava.net.preferIPv4Stack=true "
+JVM_OPTS="$JVM_OPTS -Dcom.sun.management.jmxremote "
+JVM_OPTS="$JVM_OPTS -Dcom.sun.management.jmxremote.port=9010 "
+JVM_OPTS="$JVM_OPTS -Dcom.sun.management.jmxremote.rmi.port=9011 "
+JVM_OPTS="$JVM_OPTS -Dcom.sun.management.jmxremote.local.only=false "
+JVM_OPTS="$JVM_OPTS -Dcom.sun.management.jmxremote.authenticate=false "
+JVM_OPTS="$JVM_OPTS -Dcom.sun.management.jmxremote.ssl=false"
+
+USER=<%= @service_user %>
+CLASSPATH="/usr/share/java/commons-daemon.jar:$BASE_PATH/lib/*:<%= @service_config_dir %>"
+MAIN_CLASS=<%= @service_main_class %>
+
+check_pid() {
+    if [ -a "${PIDFILE}" ]
+    then
+        PID="`cat ${PIDFILE}`"
+
+        ps -p ${PID} > /dev/null
+
+        return $?
+    fi
+
+    return 1
+}
+
+check_sub_pids() {
+    if [ -a "${PIDFILE}" ]
+    then
+        PID="`cat ${PIDFILE}`"
+
+        pgrep -P ${PID} > /dev/null
+
+        return $?
+    fi
+
+    return 1
+}
+
+start() {
+
+    if check_pid
+    then
+        echo "Service is already running: ${PID}"
+        return 0
+    else
+        if [ -a "${PIDFILE}" ]
+        then
+            echo "Removing stale PID file. ${PIDFILE}"
+            sudo -u <%= @service_user %> rm -f ${PIDFILE}
+        fi
+    fi
+
+    echo "Starting <%= @service_name %> service."
+
+    $JSVC -pidfile $PIDFILE -user $USER $JVM_OPTS -outfile $OUTFILE -errfile $ERRFILE -cp $CLASSPATH $MAIN_CLASS
+
+    return $?
+}
+
+stop() {
+
+    if ! check_pid
+    then
+        echo "Service is not running."
+        return 0
+    fi
+
+    PID="`cat ${PIDFILE}`"
+
+    echo "Stopping services group ${PID}"
+
+    $JSVC -stop -pidfile $PIDFILE -user $USER $JVM_OPTS -outfile $OUTFILE -errfile $ERRFILE -cp $CLASSPATH $MAIN_CLASS
+
+    return $?
+}
+
+# Status
+status() {
+    if [ -a "${PIDFILE}" ]
+    then
+        PID="`cat ${PIDFILE}`"
+
+        ps -p ${PID} > /dev/null
+
+        if (( $? == 0 ))
+        then
+            exit 0
+        else
+            exit 1
+        fi
+    else
+        exit 3
+    fi
+}
+
+### main logic ###
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+        status
+        ;;
+  restart|reload|condrestart)
+        stop
+        sleep 5
+        start
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+esac

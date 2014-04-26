@@ -1,0 +1,16 @@
+akka {
+    loggers = ["akka.event.slf4j.Slf4jLogger"]
+    loglevel = "DEBUG"
+}
+
+spray.can.server {
+    request-timeout = 10s
+}
+
+snsMonitor {
+  chef {
+    clientId = "<%= node[:snsmonitor][:chef][:client_id] %>"
+    organization = "<%= node[:snsmonitor][:chef][:organization] %>"
+    clientKeyPath = "<%= node[:snsmonitor][:chef][:key_path] %>"
+  }
+}
