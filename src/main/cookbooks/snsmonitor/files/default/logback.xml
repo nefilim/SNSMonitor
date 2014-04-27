@@ -16,6 +16,8 @@
 
     <logger name="com.amazonaws" level="INFO" />
     <logger name="org.nefilim.chefclient" level="INFO" />
+    <logger name="spray.can.server" level="INFO" />
+    <logger name="akka.io" level="INFO" />
 
     <root level="DEBUG">
       <appender-ref ref="FILE" />
