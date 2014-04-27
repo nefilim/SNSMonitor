@@ -113,6 +113,7 @@
         "Properties": {
            "SecurityGroups" : [ { "Ref" : "LoadBalancerSecurityGroup" } ],
            "Subnets" : { "Ref" : "LBSubnets" },
+           "CrossZone": true,
            "Listeners": [
               { "InstancePort": 8080,
                 "Protocol": "HTTP",
