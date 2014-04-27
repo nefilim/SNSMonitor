@@ -4,8 +4,8 @@ import akka.actor._
 import com.typesafe.scalalogging.slf4j.Logging
 import akka.io.IO
 import spray.can.Http
-import com.minomonsters.generated.BuildInfo
 import scala.language.postfixOps
+import org.nefilim.generated.BuildInfo
 
 
 /**

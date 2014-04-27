@@ -10,7 +10,7 @@
 
 Chef::Log.info("installing SNS Monitor")
 
-src_filename = "snsMonitor-#{node[:snsmonitor][:version]}.tgz"
+src_filename = "snsMonitor.tgz"
 src_filepath = "#{Chef::Config['file_cache_path']}/#{src_filename}"
 extract_path = "#{node[:snsmonitor][:app_dir]}"
 
@@ -60,7 +60,6 @@ end
 
 remote_file src_filepath do
   source node[:snsmonitor][:url]
-  #checksum node['nginx']['foo123']['checksum']
   owner "#{node[:snsmonitor][:system_user]}"
   group "#{node[:snsmonitor][:system_group]}"
   mode 00644

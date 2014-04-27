@@ -15,6 +15,7 @@ object SNSMonitorAPIWorker {
 class SNSMonitorAPIWorker
   extends Actor
   with SNSMonitorAPI
+  with HealthAPI
   with ServiceActors
   with AkkaExecutionContextProvider
 {
@@ -32,7 +33,7 @@ class SNSMonitorAPIWorker
 
   def receive = handleTimeouts orElse router
 
-  val route = eventRoute
+  val route = eventRoute ~ healthRoute
 
   def router = runRoute(route)
 
