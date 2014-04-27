@@ -1,9 +1,9 @@
 SNSMonitor
 ==========
 
-HTTP(s) service to consume SNS Notifications. The primary motivation for creating this is to keep Chef's view in sync with EC2 Auto Scale groups (created by CloudFormation). 
+HTTP(s) service to consume SNS Notifications. The primary motivation for creating this is to keep Chef's view in sync with EC2 Auto Scale groups. When AutoScale groups scale out, new nodes are registered with Chef (Hosted/Server) as they start up but when the AutoScale group scales in/down, the nodes & clients are orphaned in Chef (Hosted/Server). By registering your AutoScalingGroup with a SNS topic, notifications are sent for the group lifecycle events. SNSMonitor will consume these notifications and in case of scaling in/down, the corresponding chef nodes & clients will be deleted from Chef (Hosted/Server). 
 
-Depends on https://github.com/nefilim/ScalaChefClient. A HTTP(s) subscription needs to be added to the SNS topic (that is associated with your AutoScale group) that points to the endpoint exposed by this service. Note that SNS doesn't appear to support VPC nodes, so it must be a public (or the ELB in front of it at least), for instance: 
+Depends on https://github.com/nefilim/ScalaChefClient. A HTTP(s) subscription needs to be added to the SNS topic (that is associated with your AutoScale group) that points to the endpoint exposed by this service. Note that SNS doesn't appear to support VPC nodes, so it must be a public (or public ELB fronted), for instance: 
 
 http://54.54.23.23:8080/snsmonitor/v1/event
 
@@ -22,6 +22,15 @@ The provided Instance_Id is queried with the Chef client, the resulting node is 
 Installation
 ---
 
+Be sure to register a notification topic with your *AWS::AutoScaling::AutoScalingGroup* in your CloudFormation template:
+
+```
+"NotificationConfiguration" : {
+   "TopicARN" : { "Ref" : "NotificationTopic" },
+   "NotificationTypes" : [ "autoscaling:EC2_INSTANCE_LAUNCH","autoscaling:EC2_INSTANCE_LAUNCH_ERROR","autoscaling:EC2_INSTANCE_TERMINATE", "autoscaling:EC2_INSTANCE_TERMINATE_ERROR"]
+},
+```
+
 ```
 git clone https://github.com/nefilim/SNSMonitor.git
 sbt clean universal:packageZipTarball
@@ -34,9 +43,10 @@ tar cvfz cookbooks.tar.gz cookbooks
 ```
 Upload cookbooks.tar.gz to S3 bucket.
 
-Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. 
+Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef Solo cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. 
 
 Installation locations: 
+* startup script ```/etc/init.d/snsmonitor```
 * binaries (jars): ```/usr/local/snsmonitor/```
 * app & logging config under: ```/etc/snsmonitor/```
 * logging under: ```/var/log/snsmonitor/```
