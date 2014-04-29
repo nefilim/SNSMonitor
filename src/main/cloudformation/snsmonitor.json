@@ -107,8 +107,15 @@
    },
 
    "Resources" : {
+       "NotificationTopic": {
+         "Type": "AWS::SNS::Topic",
+         "Properties": {
+           "TopicName": "AutoScale_LifeCycle_Events"
+         }
+       },
 
-      "ElasticLoadBalancer": {
+
+       "ElasticLoadBalancer": {
         "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
         "Properties": {
            "SecurityGroups" : [ { "Ref" : "LoadBalancerSecurityGroup" } ],
