@@ -21,22 +21,22 @@ object MonitorService {
   case class FailedToRemoveNodeFromChef(originalRequest: RemoveEC2InstanceFromChef)
 
   case class AWSAutoScalingNotification(
-           StatusCode: String,
+           StatusCode: Option[String],
            Service: String,
            AutoScalingGroupName: String,
-           Description: String,
-           ActivityId: String,
+           Description: Option[String],
+           ActivityId: Option[String],
            Event: String,
            AutoScalingGroupARN: String,
-           Progress: Int,
+           Progress: Option[Int],
            Time: String,
            AccountId: String,
            RequestId: String,
-           StatusMessage: String,
-           EndTime: String,
-           EC2InstanceId: String,
-           StartTime: String,
-           Cause: String)
+           StatusMessage: Option[String],
+           EndTime: Option[String],
+           EC2InstanceId: Option[String],
+           StartTime: Option[String],
+           Cause: Option[String])
 
   object MyJsonProtocol extends DefaultJsonProtocol {
     implicit val AWSAutoScalingNotificationFormat = jsonFormat16(AWSAutoScalingNotification)
@@ -95,8 +95,12 @@ class MonitorService(chefClient: ChefClient) extends Actor with ActorLogging {
     val asgEvent = json.convertTo[AWSAutoScalingNotification]
     asgEvent.Event.toLowerCase match {
       case "autoscaling:ec2_instance_terminate" =>
-        log.info("group {} scaling down, removing node {}", asgEvent.AutoScalingGroupName, asgEvent.EC2InstanceId)
-        context.actorOf(RemoveChefNodeCommandActor.props(chefClient)) ! RemoveEC2InstanceFromChef(asgEvent.EC2InstanceId, notification, sender())
+        asgEvent.EC2InstanceId.map { ec2InstanceId =>
+          log.info("group {} scaling down, removing node {}", asgEvent.AutoScalingGroupName, ec2InstanceId)
+          context.actorOf(RemoveChefNodeCommandActor.props(chefClient)) ! RemoveEC2InstanceFromChef(ec2InstanceId, notification, sender())
+        }
+        if (!asgEvent.EC2InstanceId.isDefined)
+          log.error("we receive a ec2_instance_terminate notification but without a ec2InstanceId?? {}", asgEvent)
       case _ =>
         log.info("ignoring other ASG event {}", asgEvent.Event)
         sender ! (StatusCodes.OK, s"Ignoring ${notification.MessageId}")

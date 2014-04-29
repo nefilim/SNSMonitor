@@ -18,7 +18,7 @@ import spray.http.StatusCodes
 class MonitorServiceSpec
   extends TestKit(ActorSystem("testsystem"))
   with Logging
-  with FeatureSpecLike
+  with FunSpecLike
   with Matchers {
 
   implicit val timeout = Timeout(5 seconds)
@@ -39,8 +39,24 @@ class MonitorServiceSpec
       |}
     """.stripMargin
 
-  feature("process SNS notifications") {
-    scenario("process auto scaling terminate event") {
+  val minimalNotification =
+  """
+    |{
+    |  "Type" : "Notification",
+    |  "MessageId" : "22559f04-d218-52ee-89a7-d4dd6b556719",
+    |  "TopicArn" : "arn:aws:sns:us-west-2:908601866461:AutoScale_LifeCycle_Events",
+    |  "Subject" : "Auto Scaling: test notification for group \"ToastyPipe-AutoScaleGroupCollector-1KWGEG2RPLOHL\"",
+    |  "Message" : "{\"AutoScalingGroupName\":\"ToastyPipe-AutoScaleGroupCollector-1KWGEG2RPLOHL\",\"Service\":\"AWS Auto Scaling\",\"Time\":\"2014-04-29T14:28:29.690Z\",\"AccountId\":\"908601866461\",\"Event\":\"autoscaling:TEST_NOTIFICATION\",\"RequestId\":\"88bf6069-cfaa-11e3-a2dc-cd20eb22172d\",\"AutoScalingGroupARN\":\"arn:aws:autoscaling:us-west-2:908601866461:autoScalingGroup:3bb92dc2-b6ab-4240-8ae2-759954df90a4:autoScalingGroupName/ToastyPipe-AutoScaleGroupCollector-1KWGEG2RPLOHL\"}",
+    |  "Timestamp" : "2014-04-29T14:28:29.734Z",
+    |  "SignatureVersion" : "1",
+    |  "Signature" : "TqPr8TepNM3zSigsl3SqyTSPiJavDExyPiWypVX5irIdZyFGLc72NZCJdDzIiO8YIjVOwzFuLNGka/FLo97Dr3tNIdiQ/fcelm4Cyw1FfsZZeYqc3VKmcVxW50M7sYQEUMKV71N3/pT6pJBdPDGkDggBYK07VcDZUQEiFHPZOxDdfCBL0y7bfHh+5egjEVAZxlnQOKdDTBnlIxqMtPXWP+ZEK1jhKXM4H/EmDN1nQ6AIKCL5/uOjcy/m6BpjVFaCQoAFo6H9D1Sx131snXHm42nkMaXe6VDGR4eYQvEE8EsgJmA3tW/GRtSysaX/U45jKuJJsdYsanyL9q3RU5zysQ==",
+    |  "SigningCertURL" : "https://sns.us-west-2.amazonaws.com/SimpleNotificationService-e372f8ca30337fdb084e8ac449342c77.pem",
+    |  "UnsubscribeURL" : "https://sns.us-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-west-2:908601866461:AutoScale_LifeCycle_Events:f56a91e3-d16f-419b-9392-cf02786f3f75"
+    |}
+  """.stripMargin
+
+  describe("process SNS notifications") {
+    it("should process auto scaling terminate event") {
       val chefClient = new StubChefClient()
 
       val monitorService = TestActorRef[MonitorService](MonitorService.props(chefClient))
@@ -52,5 +68,16 @@ class MonitorServiceSpec
       logger.info("GOT RESULT from monitorservice {}", result)
     }
 
+    it("should not break on minimal notification") {
+      val chefClient = new StubChefClient()
+
+      val monitorService = TestActorRef[MonitorService](MonitorService.props(chefClient))
+
+      val json = JsonParser(minimalNotification)
+      val notification = json.convertTo[SNSNotification]
+      val result = Await.result((monitorService ? notification).mapTo[(StatusCode, String)], timeout.duration)
+      result._1 should be (StatusCodes.OK)
+      logger.info("GOT RESULT from monitorservice {}", result)
+    }
   }
 }
