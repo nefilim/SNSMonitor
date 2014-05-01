@@ -1,4 +1,4 @@
-package org.nefilim.snsmonitor.asg
+package org.nefilim.snsmonitor.api
 
 import spray.routing._
 
@@ -15,10 +15,12 @@ import spray.httpx.SprayJsonSupport
 import akka.pattern._
 import spray.httpx.marshalling.MetaMarshallers
 import scala.concurrent.Promise
+import org.nefilim.snsmonitor.domain.API._
+import org.nefilim.snsmonitor.service.{AkkaExecutionContextProvider, ServiceActors}
 
 object SNSMonitorAPI extends Logging {
-  private[asg] val ASGMonitorAPIVersion = "v1"
-  private[asg] val ASGEventPath = "event"
+  private[api] val ASGMonitorAPIVersion = "v1"
+  private[api] val ASGEventPath = "event"
 
   def eventRouteBase(innerRoute: Route): Route = {
     apiRoot {
@@ -28,34 +30,6 @@ object SNSMonitorAPI extends Logging {
     }
   }
 
-  case class SNSSubscriptionConfirm(
-        Message: String,
-        MessageId: String,
-        Signature: String,
-        SignatureVersion: String,
-        SigningCertURL: String,
-        SubscribeURL: String,
-        Timestamp: String,
-        Token: String,
-        TopicArn: String,
-        Type: String)
-
-  case class SNSNotification(
-          Message: String,
-          MessageId: String,
-          Signature: String,
-          SignatureVersion: String,
-          SigningCertURL: String,
-          Subject: Option[String],
-          Timestamp: String,
-          TopicArn: String,
-          Type: String,
-          UnsubscribeURL: String)
-
-  object MyJsonProtocol extends DefaultJsonProtocol {
-    implicit val snsNotificationFormat = jsonFormat10(SNSNotification)
-    implicit val snsSubscriptionConfirmFormat = jsonFormat10(SNSSubscriptionConfirm)
-  }
 }
 
 import SNSMonitorAPI._
@@ -79,6 +53,9 @@ trait SNSMonitorAPI extends HttpService with Logging with SprayJsonSupport with 
                     val subscriptionConfirmation = json.convertTo[SNSSubscriptionConfirm]
                     logger.info("got a subscription confirmation! {}", subscriptionConfirmation)
                     subscriptionConfirmation
+
+                  case "unsubscribeconfirmation" =>
+                    logger.warn("ignoring UnsubscribeConfirmation")
 
                   case "notification" =>
                     val notification = json.convertTo[SNSNotification]

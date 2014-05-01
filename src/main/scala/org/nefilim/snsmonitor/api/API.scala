@@ -1,4 +1,4 @@
-package org.nefilim.snsmonitor.asg
+package org.nefilim.snsmonitor.api
 
 import spray.routing._
 import spray.routing.Directives._

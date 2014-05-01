@@ -1,4 +1,4 @@
-package org.nefilim.snsmonitor.asg
+package org.nefilim.snsmonitor
 
 import akka.actor._
 import com.typesafe.scalalogging.slf4j.Logging
@@ -6,6 +6,7 @@ import akka.io.IO
 import spray.can.Http
 import scala.language.postfixOps
 import org.nefilim.generated.BuildInfo
+import org.nefilim.snsmonitor.service.SNSMonitorAPIWorker
 
 
 /**

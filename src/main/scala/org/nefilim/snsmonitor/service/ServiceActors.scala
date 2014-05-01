@@ -1,4 +1,4 @@
-package org.nefilim.snsmonitor.asg
+package org.nefilim.snsmonitor.service
 
 import akka.actor.{ActorLogging, Actor, ActorRef}
 import javax.management.Notification

@@ -1,16 +1,16 @@
-package org.nefilim.snsmonitor.asg
+package org.nefilim.snsmonitor.api
 
 import spray.routing._
 import com.typesafe.scalalogging.slf4j.Logging
-import org.nefilim.snsmonitor.asg.API._
 import spray.routing.Directives._
+import API._
 
 /**
  * Created by peter on 4/27/14.
  */
 object HealthAPI extends Logging {
-  private[asg] val HealthAPIVersion = "v1"
-  private[asg] val HealthPath = "health"
+  private[api] val HealthAPIVersion = "v1"
+  private[api] val HealthPath = "health"
 
   def healthRouteBase(innerRoute: Route): Route = {
     apiRoot {

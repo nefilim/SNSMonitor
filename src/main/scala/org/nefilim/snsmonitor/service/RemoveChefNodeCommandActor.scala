@@ -1,12 +1,12 @@
-package org.nefilim.snsmonitor.asg
+package org.nefilim.snsmonitor.service
 
 import akka.actor.{ActorRef, Props, Actor, ActorLogging}
-import org.nefilim.snsmonitor.asg.MonitorService.{FailedToRemoveNodeFromChef, NodeRemovedFromChef, RemoveEC2InstanceFromChef}
 import scala.util.{Failure, Success}
 import org.nefilim.chefclient.ChefClient
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import org.nefilim.snsmonitor.asg.RemoveChefNodeCommandActor.RemoveChefNodeAndClient
+import org.nefilim.snsmonitor.domain.API.SNSNotification
+import org.nefilim.snsmonitor.service.RemoveChefNodeCommandActor._
 
 /**
  * Created by peter on 4/24/14.
@@ -16,8 +16,14 @@ import org.nefilim.snsmonitor.asg.RemoveChefNodeCommandActor.RemoveChefNodeAndCl
  * deletes the chef client for the node
  */
 object RemoveChefNodeCommandActor {
-  case class FindChefNodeForEC2InstanceId(r: RemoveEC2InstanceFromChef)
+  // external
+  case class RemoveEC2InstanceFromChef(ec2InstanceId: String, originalNotification: SNSNotification, requester: ActorRef, attempt: Int = 1)
+  case class NodeRemovedFromChef(originalRequest: RemoveEC2InstanceFromChef)
+  case class FailedToRemoveNodeFromChef(originalRequest: RemoveEC2InstanceFromChef)
+
+  // internal
   case class RemoveChefNodeAndClient(node: String, originalRequest: RemoveEC2InstanceFromChef)
+  //case class FindChefNodeForEC2InstanceId(r: RemoveEC2InstanceFromChef)
 
   def props(chefClient: ChefClient) = Props(classOf[RemoveChefNodeCommandActor], chefClient)
 }

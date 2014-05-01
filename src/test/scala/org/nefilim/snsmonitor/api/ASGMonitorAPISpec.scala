@@ -1,4 +1,4 @@
-package org.nefilim.snsmonitor.asg
+package org.nefilim.snsmonitor.api
 
 import org.scalatest.{FunSpec, Matchers}
 import com.typesafe.scalalogging.slf4j.Logging
@@ -6,8 +6,8 @@ import spray.testkit.ScalatestRouteTest
 import API._
 import SNSMonitorAPI._
 import spray.routing.HttpService
-import spray.http.HttpHeaders
-import HttpHeaders._
+import org.nefilim.snsmonitor.service.{AkkaExecutionContextProvider, StubServiceActors}
+import spray.client.pipelining._
 
 /**
  * Created by peter on 4/23/14.

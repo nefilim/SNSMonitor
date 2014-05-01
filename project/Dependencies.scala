@@ -32,6 +32,7 @@ object Dependencies {
     val sprayJson = "1.2.6"
     val json4s = "3.2.8"
     val scalaChefClient = "0.3"
+    val scalaHipChatClient = "0.1"
   }
 
   object Libraries {
@@ -63,11 +64,13 @@ object Dependencies {
     val akkaLogging = "com.typesafe.akka"    %% "akka-slf4j"    % V.akka
 
     val typesafeConfig = "com.typesafe"      % "config"         % V.typesafeConfig
-    val scalaChefClient = ("org.nefilim"     %% "chefclient"    % V.scalaChefClient).excludeAll( ExclusionRule(organization = "io.spray"))
+    val scalaChefClient = "org.nefilim"     %% "chefclient"    % V.scalaChefClient
+    val scalaHipChatClient = "org.nefilim"     %% "hipchatclient"    % V.scalaHipChatClient
   }
 
   import Libraries._
 
   val autoScaleGroupMonitor = Seq(awsSDK, akka, akkaTestKit, akkaLogging, typesafeLogging, 
-    sprayClient, sprayCan, sprayHTTP, sprayRouting, sprayJson, sprayTestKit, scalaTest, logback, scalaChefClient)
+    sprayClient, sprayCan, sprayHTTP, sprayRouting, sprayJson, sprayTestKit, scalaTest, logback,
+    scalaChefClient, scalaHipChatClient)
 }

@@ -1,4 +1,4 @@
-package org.nefilim.snsmonitor.asg
+package org.nefilim.snsmonitor.service
 
 import org.nefilim.chefclient.ChefClient
 import com.typesafe.scalalogging.slf4j.Logging
