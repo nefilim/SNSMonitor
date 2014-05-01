@@ -2,6 +2,7 @@ SNSMonitor
 ==========
 
 HTTP(s) service to consume SNS Notifications. The primary motivation for creating this is to keep Chef's view in sync with EC2 Auto Scale groups. When AutoScale groups scale out, new nodes are registered with Chef (Hosted/Server) as they start up but when the AutoScale group scales in/down, the nodes & clients are orphaned in Chef (Hosted/Server). By registering your AutoScalingGroup with a SNS topic, notifications are sent for the group lifecycle events. SNSMonitor will consume these notifications and in case of scaling in/down, the corresponding chef nodes & clients will be deleted from Chef (Hosted/Server). 
+
 In addition, if the conf contains HipChat token & room, AutoScaling notifications will be sent to the configured room.
 
 Depends on:
