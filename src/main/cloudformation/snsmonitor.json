@@ -7,17 +7,20 @@
 
        "SNSMonitorBinaryURL" : {
          "Description" : "URL to the SNS Monitor tgz, typically S3 bucket",
-         "Type" : "String"
+         "Type" : "String",
+         "Default": ""
        },
 
        "ChefCookbookURL" : {
          "Description" : "URL to your cookbooks.tar.gz, typically S3 bucket",
-         "Type" : "String"
+         "Type" : "String",
+         "Default": ""
        },
 
        "ChefUserId" : {
          "Description" : "User ID to use with the Chef Server API",
-         "Type" : "String"
+         "Type" : "String",
+         "Default": ""
        },
 
        "ChefKeyPath" : {
@@ -28,20 +31,24 @@
 
        "ChefOrganization" : {
          "Description" : "The Chef Organization to use with the Chef Server API",
-         "Type" : "String"
+         "Type" : "String",
+         "Default": ""
        },
 
        "VpcId" : {
          "Type" : "String",
-         "Description" : "VpcId of your existing Virtual Private Cloud (VPC)"
+         "Description" : "VpcId of your existing Virtual Private Cloud (VPC)",
+         "Default": ""
        },
        "NodeSubnets" : {
          "Type" : "CommaDelimitedList",
-         "Description" : "The SubnetId in your VPC for the AutoScaleGroup - this should probably be a private subnet"
+         "Description" : "Comma delimited list of SubnetIds in your VPC for the AutoScaleGroup - this should probably be a private subnet",
+         "Default": ""
        },
        "LBSubnets" : {
          "Type" : "CommaDelimitedList",
-         "Description" : "The SubnetId in your VPC for your ELB - this should be your public subnet with IGW"
+         "Description" : "Comma delimited list of SubnetIds in your VPC for your ELB - this should be your public subnet with IGW",
+         "Default": ""
        },
 
       "InstanceType" : {
@@ -76,7 +83,19 @@
 
       "KeyName" : {
         "Description" : "The EC2 Key Pair to allow SSH access to the instances",
-        "Type" : "String"
+        "Type" : "String",
+        "Default": ""
+      },
+
+      "HipChatToken" : {
+        "Description" : "The HipChat auth token",
+        "Type" : "String",
+        "Default": ""
+      },
+      "HipChatRoom" : {
+        "Description" : "The HipChat room",
+        "Type" : "String",
+        "Default": "DevOps"
       }
 
    },
@@ -193,6 +212,10 @@
                             "client_id": {"Ref" : "ChefUserId"},
                             "key_path": {"Ref" : "ChefKeyPath"},
                             "organization": {"Ref" : "ChefOrganization"}
+                          },
+                          "hipchat": {
+                            "token": {"Ref": "HipChatToken"},
+                            "room": {"Ref": "HipChatRoom"}
                           }
                         },
                         "run_list": [ "recipe[java]", "recipe[snsmonitor]" ]

@@ -13,4 +13,8 @@ snsMonitor {
     organization = "<%= node[:snsmonitor][:chef][:organization] %>"
     clientKeyPath = "<%= node[:snsmonitor][:chef][:key_path] %>"
   }
+  hipChat {
+    room = "<%= node[:snsmonitor][:hipchat][:room] %>"
+    token = "<%= node[:snsmonitor][:hipchat][:token] %>"
+  }
 }
