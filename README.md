@@ -2,8 +2,16 @@ SNSMonitor
 ==========
 
 HTTP(s) service to consume SNS Notifications. The primary motivation for creating this is to keep Chef's view in sync with EC2 Auto Scale groups. When AutoScale groups scale out, new nodes are registered with Chef (Hosted/Server) as they start up but when the AutoScale group scales in/down, the nodes & clients are orphaned in Chef (Hosted/Server). By registering your AutoScalingGroup with a SNS topic, notifications are sent for the group lifecycle events. SNSMonitor will consume these notifications and in case of scaling in/down, the corresponding chef nodes & clients will be deleted from Chef (Hosted/Server). 
+In addition, if the conf contains HipChat token & room, AutoScaling notifications will be sent to the configured room.
 
-Depends on https://github.com/nefilim/ScalaChefClient. A HTTP(s) subscription needs to be added to the SNS topic (that is associated with your AutoScale group) that points to the endpoint exposed by this service. Note that SNS doesn't appear to support VPC nodes, so it must be a public (or public ELB fronted), for instance: 
+Depends on:
+* https://github.com/nefilim/ScalaChefClient (published to maven central)
+* https://github.com/nefilim/ScalaHipChatClient (NOT published to maven central, clone & publishLocal)
+* Akka 2.3
+* Spray 1.3
+* Json4S
+
+A HTTP(s) subscription needs to be added to the SNS topic (that is associated with your AutoScale group) that points to the endpoint exposed by this service. Note that SNS doesn't appear to support VPC nodes, so it must be a public (or public ELB fronted), for instance: 
 
 http://54.54.23.23:8080/snsmonitor/v1/event
 
