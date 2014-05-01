@@ -31,7 +31,7 @@ The provided Instance_Id is queried with the Chef client, the resulting node is 
 Installation
 ---
 
-Be sure to register the created notification topic with your *AWS::AutoScaling::AutoScalingGroup* in your CloudFormation template:
+Be sure to register the created notification topic (see below) with your *AWS::AutoScaling::AutoScalingGroup* in your CloudFormation template:
 
 ```
 "NotificationConfiguration" : {
@@ -50,9 +50,9 @@ Copy the snsmonitor-(version).tgz to an accessible S3 bucket.
 cd SNSMonitor/src/main/
 tar cvfz cookbooks.tar.gz cookbooks
 ```
-Upload cookbooks.tar.gz to S3 bucket.
+Upload cookbooks.tar.gz to configured (***SNSMonitorBinaryURL***) S3 bucket.
 
-Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef Solo cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. The CloudFormation template will also create the SNS Topic (AutoScale_LifeCycle_Events), but you have to go in an manually register the resulting SNSMonitor endpoint with this topic. 
+Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef Solo cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. The CloudFormation template will also create the SNS Topic (AutoScale_LifeCycle_Events), but you have to go in and ***manually register*** the resulting SNSMonitor endpoint with this topic in the SNS console. 
 
 Installation locations: 
 * startup script ```/etc/init.d/snsmonitor```
