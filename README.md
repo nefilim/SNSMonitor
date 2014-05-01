@@ -31,7 +31,7 @@ The provided Instance_Id is queried with the Chef client, the resulting node is 
 Installation
 ---
 
-Be sure to register a notification topic with your *AWS::AutoScaling::AutoScalingGroup* in your CloudFormation template:
+Be sure to register the created notification topic with your *AWS::AutoScaling::AutoScalingGroup* in your CloudFormation template:
 
 ```
 "NotificationConfiguration" : {
@@ -44,7 +44,7 @@ Be sure to register a notification topic with your *AWS::AutoScaling::AutoScalin
 git clone https://github.com/nefilim/SNSMonitor.git
 sbt clean universal:packageZipTarball
 ```
-Copy the snsmonitor-0.1.tgz to an accessible S3 bucket.
+Copy the snsmonitor-(version).tgz to an accessible S3 bucket.
 
 ```
 cd SNSMonitor/src/main/
@@ -52,7 +52,7 @@ tar cvfz cookbooks.tar.gz cookbooks
 ```
 Upload cookbooks.tar.gz to S3 bucket.
 
-Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef Solo cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. 
+Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef Solo cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. The CloudFormation template will also create the SNS Topic (AutoScale_LifeCycle_Events), but you have to go in an manually register the resulting SNSMonitor endpoint with this topic. 
 
 Installation locations: 
 * startup script ```/etc/init.d/snsmonitor```
@@ -72,7 +72,7 @@ The following parameters needs to be set on the CloudFormation template (either 
 * ***LBSubnets*** your VPC subnets for the ELB to go into, needs to be a "public" VPC subnet
 
 
-Right now you have to make your own plan to get your keys on the your instances. 
+Right now you have to make your own plan to get your Chef client keys on the your instances. 
 
 Standalone Configuration
 ---
