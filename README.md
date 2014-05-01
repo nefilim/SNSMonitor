@@ -12,7 +12,7 @@ Depends on:
 * Spray 1.3
 * Json4S
 
-A HTTP(s) subscription needs to be added to the SNS topic (that is associated with your AutoScale group) that points to the endpoint exposed by this service. Note that SNS doesn't appear to support VPC nodes, so it must be a public (or public ELB fronted), for instance: 
+A HTTP(s) subscription needs to be added to the SNS topic (that is associated with your AutoScale group) that points to the endpoint exposed by this service. Note that SNS doesn't appear to support VPC nodes, so it must have a publish IP (or public ELB fronted), for instance: 
 
 http://54.54.23.23:8080/snsmonitor/v1/event
 
