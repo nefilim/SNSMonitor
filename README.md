@@ -40,19 +40,24 @@ Be sure to register the created notification topic (see below) with your *AWS::A
 },
 ```
 
+***I.*** Clone and build the artifact
+
 ```
 git clone https://github.com/nefilim/SNSMonitor.git
 sbt clean universal:packageZipTarball
 ```
-Copy the snsmonitor-(version).tgz to the configured (***SNSMonitorBinaryURL***) S3 bucket.
+***II.*** Copy the target/universal/snsmonitor-(version).tgz to the configured (***SNSMonitorBinaryURL***) S3 bucket.
 
+***III.*** Bundle up the cookbooks for chef-solo
 ```
 cd SNSMonitor/src/main/
 tar cvfz cookbooks.tar.gz cookbooks
 ```
-Upload cookbooks.tar.gz to configured (***ChefCookbookURL***) S3 bucket.
+***IV.*** Upload cookbooks.tar.gz to configured (***ChefCookbookURL***) S3 bucket.
 
-Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef Solo cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. The CloudFormation template will also create the SNS Topic (AutoScale_LifeCycle_Events), but you have to go in and ***manually register*** the resulting SNSMonitor endpoint with this topic in the SNS console. 
+***V.*** Use the included CloudFormation template (```src/main/cloudformation/snsmonitor.json```) and Chef Solo cookbook (```src/main/cookbooks```) to spin up a 2 node AutoScale group in a VPC fronted by an ELB. The snsmonitor cookbook depends on the Java cookbook (https://github.com/socrata-cookbooks/java) that is included here also. 
+
+***VI.*** The CloudFormation template will also create the SNS Topic (AutoScale_LifeCycle_Events), but you have to go in and ***manually register*** the resulting SNSMonitor endpoint (http://.../snsmonitor/v1/event) with this topic in the SNS console. 
 
 Installation locations: 
 * startup script ```/etc/init.d/snsmonitor```
